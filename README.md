@@ -1,6 +1,6 @@
-# Claude MCP Scaffold
+# Advanced Web Tools
 
-A scaffold for Claude's Model Control Protocol (MCP) with advanced web browsing capabilities.
+An MCP server that provides advanced web interaction and browser automation capabilities for Claude and other AI assistants.
 
 ## Overview
 
