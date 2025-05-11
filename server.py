@@ -191,6 +191,26 @@ except ImportError as e:
     logger.warning(f"Web interaction tools not loaded. Error: {str(e)}")
     logger.warning("Make sure to install required dependencies with install_dependencies.py")
 
+# Import and register computer interaction tools
+try:
+    from .computer_interaction import register_all_computer_tools
+    
+    logger.info("Registering computer interaction tools...")
+    computer_tools = register_all_computer_tools(mcp)
+    logger.info("Successfully registered computer interaction tools")
+    
+    # Store references for status reporting
+    screen_controller = computer_tools.get('screen_controller')
+    keyboard_mouse = computer_tools.get('keyboard_mouse')
+    window_manager = computer_tools.get('window_manager')
+    system_ops = computer_tools.get('system_ops')
+    computer_vision = computer_tools.get('computer_vision')
+    
+except ImportError as e:
+    logger.warning(f"Computer interaction tools not loaded. Error: {str(e)}")
+    logger.warning("Make sure to install required dependencies: pyautogui, pygetwindow, etc.")
+    computer_tools = None
+
 
 @mcp.tool()
 async def server_status() -> Dict[str, Any]:
@@ -203,7 +223,7 @@ async def server_status() -> Dict[str, Any]:
     try:
         # Gather basic server info
         status_info = {
-            "version": "0.2.0",  # Updated version with enhanced capabilities
+            "version": "0.3.0",  # Updated version with computer interaction
             "uptime": "Unknown",  # Would need to track server start time
             "tools_count": len(mcp.tools)
         }
@@ -228,8 +248,19 @@ async def server_status() -> Dict[str, Any]:
             "visual_debugging": 'visual_tools' in globals(),
             "console_integration": 'console_tools' in globals(),
             "data_persistence": 'persistence_tools' in globals(),
-            "data_export": 'export_tools' in globals()
+            "data_export": 'export_tools' in globals(),
+            "computer_interaction": 'computer_tools' in globals()
         }
+        
+        # Add computer interaction status
+        if 'computer_tools' in globals() and computer_tools:
+            status_info["computer_capabilities"] = {
+                "screen_control": 'screen_controller' in globals() and screen_controller.initialized,
+                "keyboard_mouse": 'keyboard_mouse' in globals() and keyboard_mouse.initialized,
+                "window_management": 'window_manager' in globals() and window_manager.initialized,
+                "system_operations": 'system_ops' in globals(),
+                "computer_vision": 'computer_vision' in globals() and computer_vision.initialized
+            }
         
         # Add error stats if available
         if 'error_tools' in globals() and 'error_handler' in error_tools:
@@ -294,6 +325,7 @@ def help_prompt() -> str:
     has_console_tools = 'console_tools' in globals()
     has_persistence_tools = 'persistence_tools' in globals()
     has_export_tools = 'export_tools' in globals()
+    has_computer_tools = 'computer_tools' in globals()
     
     base_prompt = """
     This is the Claude MCP Scaffold Server. You can use the following tools:
@@ -414,6 +446,67 @@ def help_prompt() -> str:
     - create_data_archive: Create a compressed archive of exported data
     """
     
+    computer_tools_prompt = """
+    Computer Interaction tools:
+    
+    - computer_use: Unified tool for computer interactions
+      This tool can perform multiple operations in a single call:
+      
+      Screen operations:
+      - capture_screen: Capture a screenshot
+      - find_on_screen: Find an image on screen
+      - get_pixel_color: Get color at specific coordinates
+      - wait_for_screen_change: Wait for screen content to change
+      
+      Mouse operations:
+      - move_mouse: Move mouse to coordinates
+      - click: Click at position
+      - drag: Drag from one point to another
+      - scroll: Scroll mouse wheel
+      - get_mouse_position: Get current mouse position
+      
+      Keyboard operations:
+      - type_text: Type text
+      - press_key: Press a key or key combination
+      - hot_key: Press a hotkey combination
+      - wait_for_key: Wait for a specific key press
+      
+      Window operations:
+      - get_all_windows: List all windows
+      - find_window: Find windows by title
+      - activate_window: Bring window to front
+      - minimize_window: Minimize a window
+      - maximize_window: Maximize a window
+      - resize_window: Resize a window
+      - move_window: Move a window
+      - close_window: Close a window
+      - get_active_window: Get active window info
+      - arrange_windows: Arrange windows in a layout
+      
+      System operations:
+      - get_system_info: Get system information
+      - list_processes: List running processes
+      - start_application: Start an application
+      - kill_process: Kill a process
+      - execute_command: Execute a shell command
+      - get_environment_variables: Get environment variables
+      - set_environment_variable: Set an environment variable
+      - get_clipboard_content: Get clipboard content
+      - set_clipboard_content: Set clipboard content
+    
+    Individual computer interaction tools:
+    - capture_screenshot: Capture a screenshot
+    - find_text_on_screen: Find text using OCR
+    - click_at: Click at specific coordinates
+    - type_text: Type text
+    - get_active_window: Get active window info
+    - list_windows: List all windows
+    - system_info: Get system information
+    - execute_system_command: Execute a system command
+    - get_clipboard: Get clipboard content
+    - set_clipboard: Set clipboard content
+    """
+    
     full_prompt = base_prompt
     
     if has_web_tools:
@@ -437,5 +530,8 @@ def help_prompt() -> str:
     
     if has_export_tools:
         full_prompt += data_export_prompt
+    
+    if has_computer_tools:
+        full_prompt += computer_tools_prompt
     
     return full_prompt

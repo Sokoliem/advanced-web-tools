@@ -1,16 +1,24 @@
 # Advanced Web Tools
 
-An MCP server that provides advanced web interaction and browser automation capabilities for Claude and other AI assistants.
+An MCP server that provides advanced web interaction and browser automation capabilities for Claude and other AI assistants, now with full computer control capabilities.
 
 ## Overview
 
-This project provides a scaffold implementation of the Model Control Protocol (MCP) server that enables Claude and other AI agents to interact with web browsers through automation. It allows AI models to perform a wide range of web interactions, including:
+This project provides a comprehensive MCP server that enables Claude and other AI agents to interact with web browsers and control computer systems. It allows AI models to perform a wide range of operations:
 
+**Web Interaction:**
 - Web navigation
 - Content extraction
 - Element interaction (click, type, etc.)
 - Structured data extraction
 - Console command execution
+
+**Computer Control:**
+- Screenshot capture and analysis
+- Mouse and keyboard control
+- Window management
+- System operations
+- Computer vision and OCR
 
 ## Quick Start
 
@@ -19,6 +27,8 @@ This project provides a scaffold implementation of the Model Control Protocol (M
 - Python 3.9+
 - [Playwright](https://playwright.dev/python/docs/intro) for browser automation
 - Beautiful Soup for HTML parsing
+- PyAutoGUI for computer control (optional)
+- Additional dependencies for computer interaction (see COMPUTER_TOOLS_README.md)
 
 ### Installation
 
@@ -46,7 +56,9 @@ python -m claude_mcp_scaffold
 
 ## Features
 
-### Unified Web Interaction Tool
+### Web Interaction
+
+**Unified Web Interaction Tool**
 
 The main tool, `web_interact`, allows for multiple operations in a single call:
 
@@ -68,6 +80,45 @@ The main tool, `web_interact`, allows for multiple operations in a single call:
   ]
 }
 ```
+
+### Computer Interaction
+
+**Unified Computer Use Tool**
+
+The `computer_use` tool provides full computer control:
+
+```json
+{
+  "operations": [
+    {
+      "type": "capture_screen",
+      "params": {}
+    },
+    {
+      "type": "click",
+      "params": {
+        "x": 100,
+        "y": 200
+      }
+    },
+    {
+      "type": "type_text",
+      "params": {
+        "text": "Hello, World!"
+      }
+    }
+  ]
+}
+```
+
+Capabilities include:
+- Screen capture and analysis
+- Mouse and keyboard control
+- Window management
+- System operations
+- Computer vision and OCR
+
+For detailed documentation on computer interaction tools, see [COMPUTER_TOOLS_README.md](COMPUTER_TOOLS_README.md).
 
 ### Persistent Browser State
 

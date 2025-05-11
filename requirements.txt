@@ -7,6 +7,17 @@ playwright>=1.39.0
 beautifulsoup4>=4.12.2
 lxml>=4.9.3
 
+# Computer interaction dependencies
+pyautogui>=0.9.53
+Pillow>=9.0.0
+pygetwindow>=0.0.9
+psutil>=5.8.0
+pyperclip>=1.8.2
+keyboard>=0.13.5
+mouse>=0.7.1
+numpy>=1.21.0
+pywin32>=301  # Windows only
+
 # Utilities
 python-dotenv>=1.0.0
 

@@ -1,0 +1,28 @@
+GitHub Upload Instructions for Advanced Web Tools MCP Server
+=========================================================
+
+1. Create a new repository on GitHub:
+   - Go to https://github.com/new  
+   - Repository name: advanced-web-tools
+   - Choose Public or Private
+   - DO NOT initialize with README, .gitignore, or license
+   - Click "Create repository"
+
+2. After creating the empty repository, you'll get a URL like:
+   https://github.com/YOUR_USERNAME/advanced-web-tools.git
+
+3. Run these commands in your terminal:
+
+   cd "C:\Users\emsok\AppData\Roaming\Claude\test\claude_mcp_scaffold"
+   git remote add origin https://github.com/YOUR_USERNAME/advanced-web-tools.git
+   git branch -M main
+   git push -u origin main
+
+Replace YOUR_USERNAME with your actual GitHub username.
+
+If you're using SSH authentication with GitHub:
+   git remote add origin git@github.com:YOUR_USERNAME/advanced-web-tools.git
+   git branch -M main
+   git push -u origin main
+
+Your repository is already initialized and has two commits ready to push!

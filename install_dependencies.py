@@ -104,6 +104,27 @@ PLAYWRIGHT_FORCE_VISIBLE=true
     print("    python -m claude_mcp_scaffold")
     print("or if you installed in development mode:")
     print("    claude-mcp")
+    
+    # Ask about computer interaction tools
+    print("\n" + "="*50)
+    print("Computer Interaction Tools")
+    print("="*50)
+    print("\nThe advanced-web-tools MCP server now supports computer interaction capabilities.")
+    print("These tools allow control of the mouse, keyboard, windows, and more.")
+    print("\nWould you like to install computer interaction dependencies?")
+    response = input("Install computer tools? (y/n): ").lower()
+    
+    if response == 'y':
+        print("\nInstalling computer interaction tools...")
+        try:
+            subprocess.run([sys.executable, "install_computer_tools.py"], check=True)
+            print("✅ Computer interaction tools installed successfully")
+        except subprocess.CalledProcessError as e:
+            print(f"❌ Error installing computer tools: {e}")
+            print("You can try running 'python install_computer_tools.py' manually later.")
+    else:
+        print("\nSkipping computer tools installation.")
+        print("You can install them later by running: python install_computer_tools.py")
 
 if __name__ == "__main__":
     main()
