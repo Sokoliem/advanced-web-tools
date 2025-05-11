@@ -7,6 +7,7 @@ from .screen_control import ScreenController
 from .keyboard_mouse import KeyboardMouseController
 from .window_manager import WindowManager
 from .system_operations import SystemOperations
+from .computer_vision import ComputerVisionTools
 
 logger = logging.getLogger(__name__)
 
@@ -19,6 +20,7 @@ class UnifiedComputerTool:
         self.keyboard_mouse = KeyboardMouseController()
         self.window_manager = WindowManager()
         self.system_ops = SystemOperations()
+        self.computer_vision = ComputerVisionTools()
     
     async def execute_operations(self, operations: List[Dict[str, Any]]) -> Dict[str, Any]:
         """
@@ -135,6 +137,16 @@ class UnifiedComputerTool:
         elif op_type == "set_clipboard_content":
             return await self.system_ops.set_clipboard_content(**params)
         
+        # Computer vision operations
+        elif op_type == "find_text_on_screen":
+            return await self.computer_vision.find_text_on_screen(**params)
+        elif op_type == "detect_elements":
+            return await self.computer_vision.detect_elements(**params)
+        elif op_type == "compare_screenshots":
+            return await self.computer_vision.compare_screenshots(**params)
+        elif op_type == "find_template":
+            return await self.computer_vision.find_template(**params)
+        
         else:
             return {"error": f"Unknown operation type: {op_type}"}
 
@@ -207,6 +219,12 @@ def register_unified_computer_tool(mcp, tool_instance=None):
         - set_environment_variable: Set an environment variable
         - get_clipboard_content: Get clipboard content
         - set_clipboard_content: Set clipboard content
+        
+        Computer vision operations:
+        - find_text_on_screen: Find text using OCR
+        - detect_elements: Detect UI elements
+        - compare_screenshots: Compare two screenshots
+        - find_template: Find template image in screenshot
         
         Returns:
             Dict with operation results
