@@ -1,0 +1,83 @@
+"""Browser Management for Web Interaction Extension."""
+
+import asyncio
+import logging
+from typing import Dict, Optional, Tuple, Any
+
+# Configure logging
+logger = logging.getLogger(__name__)
+
+class BrowserManager:
+    """Manages browser instances for web interaction."""
+    
+    def __init__(self):
+        """Initialize the browser manager."""
+        self.browser = None
+        self.context = None
+        self.active_pages = {}
+        self.initialized = False
+        
+    async def initialize(self):
+        """Initialize the browser if not already initialized."""
+        if not self.initialized:
+            try:
+                # Import here to avoid import errors if playwright isn't installed
+                import playwright.async_api as pw
+                
+                logger.info("Initializing Playwright browser...")
+                playwright = await pw.async_playwright().start()
+                self.browser = await playwright.chromium.launch(headless=True)
+                self.context = await self.browser.new_context(
+                    viewport={"width": 1280, "height": 800},
+                    user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+                )
+                self.initialized = True
+                logger.info("Browser initialized successfully")
+            except Exception as e:
+                logger.error(f"Error initializing browser: {str(e)}")
+                raise
+            
+    async def get_page(self, page_id=None):
+        """
+        Get a page by ID or create a new one.
+        
+        Args:
+            page_id: Optional ID of an existing page
+            
+        Returns:
+            Tuple of (page, page_id)
+        """
+        await self.initialize()
+        
+        # Handle string/int conversion for page_id
+        if page_id is not None:
+            # Convert to string if it's an integer or other type
+            page_id = str(page_id)
+            logger.info(f"Converted page_id to string: {page_id}")
+        
+        # Check if page exists
+        if page_id and page_id in self.active_pages:
+            logger.info(f"Using existing page with ID {page_id}")
+            return self.active_pages[page_id], page_id
+        
+        # Create new page
+        logger.info("Creating new browser page")
+        new_page = await self.context.new_page()
+        new_id = str(len(self.active_pages) + 1)
+        self.active_pages[new_id] = new_page
+        logger.info(f"Created new page with ID {new_id}, active pages: {list(self.active_pages.keys())}")
+        return new_page, new_id
+        
+    async def close(self):
+        """Close all browser resources."""
+        logger.info("Closing browser resources...")
+        if self.browser:
+            for page_id in list(self.active_pages.keys()):
+                if self.active_pages[page_id]:
+                    await self.active_pages[page_id].close()
+                    del self.active_pages[page_id]
+            
+            await self.context.close()
+            await self.browser.close()
+            self.initialized = False
+            logger.info("Browser resources closed")

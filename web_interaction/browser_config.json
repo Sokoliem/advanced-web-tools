@@ -1,0 +1,10 @@
+{
+  "headless": false,
+  "slow_mo": 100,
+  "width": 1280,
+  "height": 800,
+  "debug_screenshots": true,
+  "timeout": 30000,
+  "max_tabs": 8,
+  "tab_idle_timeout": 300
+}
