@@ -5,6 +5,8 @@ import base64
 import io
 from typing import Dict, Any, List, Optional, Tuple
 
+from .config_manager import computer_config
+
 try:
     import cv2
     import numpy as np
@@ -34,7 +36,7 @@ class ComputerVisionTools:
     async def find_text_on_screen(self, 
                                  screenshot_base64: str,
                                  text_to_find: str,
-                                 language: str = 'eng') -> Dict[str, Any]:
+                                 language: str = None) -> Dict[str, Any]:
         """
         Find text on screen using OCR.
         
@@ -48,6 +50,10 @@ class ComputerVisionTools:
         """
         if not self.ocr_available:
             return {"error": "OCR not available"}
+        
+        # Use config language if not provided
+        if language is None:
+            language = computer_config.get('vision', 'ocr_language', 'eng')
         
         try:
             # Decode image

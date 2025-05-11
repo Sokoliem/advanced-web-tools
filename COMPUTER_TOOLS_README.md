@@ -52,6 +52,111 @@ Use the provided installation script:
 python install_computer_tools.py
 ```
 
+## Configuration
+
+The computer interaction tools can be configured through:
+1. `computer_config.json` - Main configuration file
+2. Environment variables - Override specific settings
+3. Runtime parameters - Override settings for individual operations
+
+### Configuration File (computer_config.json)
+
+The main configuration file contains sections for different components:
+
+```json
+{
+    "screen": {
+        "screenshot_quality": 90,
+        "highlight_color": "red",
+        "highlight_thickness": 3,
+        "monitor_poll_interval": 0.1,
+        "wait_timeout": 5.0
+    },
+    "mouse": {
+        "movement_duration": 0.5,
+        "click_interval": 0.1,
+        "drag_duration": 1.0,
+        "failsafe": true,
+        "pause_between_actions": 0.1
+    },
+    "keyboard": {
+        "typing_interval": 0.05,
+        "hotkey_pause": 0.1,
+        "key_wait_timeout": 5.0
+    },
+    "window": {
+        "activation_wait": 0.5,
+        "operation_timeout": 10.0,
+        "arrangement_animation_time": 0.3
+    },
+    "system": {
+        "command_timeout": 30.0,
+        "process_list_sort": "memory",
+        "clipboard_retry_attempts": 3
+    },
+    "vision": {
+        "ocr_language": "eng",
+        "template_match_threshold": 0.8,
+        "edge_detection_threshold_low": 50,
+        "edge_detection_threshold_high": 150,
+        "button_min_width": 30,
+        "button_min_height": 20,
+        "textbox_min_width": 50,
+        "textbox_min_height": 15,
+        "grayscale_matching": false
+    },
+    "safety": {
+        "enable_failsafe": true,
+        "max_operation_time": 300.0,
+        "require_confirmation_for_commands": false,
+        "blocked_commands": ["rm -rf /", "format c:", "del /s /q"]
+    },
+    "performance": {
+        "enable_caching": true,
+        "cache_timeout": 60.0,
+        "max_concurrent_operations": 5,
+        "operation_queue_size": 100
+    }
+}
+```
+
+### Environment Variables
+
+Override specific settings using environment variables:
+
+- `COMPUTER_SCREENSHOT_QUALITY` - Screenshot quality (1-100)
+- `COMPUTER_HIGHLIGHT_COLOR` - Color for highlights
+- `COMPUTER_MONITOR_POLL_INTERVAL` - Screen monitoring interval
+- `COMPUTER_MOUSE_DURATION` - Default mouse movement duration
+- `COMPUTER_MOUSE_FAILSAFE` - Enable/disable failsafe
+- `COMPUTER_TYPING_INTERVAL` - Typing speed
+- `COMPUTER_WINDOW_TIMEOUT` - Window operation timeout
+- `COMPUTER_COMMAND_TIMEOUT` - System command timeout
+- `COMPUTER_OCR_LANGUAGE` - OCR language
+- `COMPUTER_TEMPLATE_THRESHOLD` - Template matching threshold
+- `COMPUTER_ENABLE_FAILSAFE` - Enable safety features
+- `COMPUTER_MAX_OPERATION_TIME` - Maximum operation duration
+
+### Configuration Manager
+
+The configuration can be accessed programmatically:
+
+```python
+from computer_interaction import computer_config
+
+# Get a specific setting
+screenshot_quality = computer_config.get('screen', 'screenshot_quality')
+
+# Update a setting
+computer_config.set('mouse', 'movement_duration', 1.0)
+
+# Save changes
+computer_config.save()
+
+# Reload from file
+computer_config.reload()
+```
+
 ## Available Tools
 
 ### 1. Unified Computer Use Tool

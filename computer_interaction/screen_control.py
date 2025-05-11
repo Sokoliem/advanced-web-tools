@@ -6,6 +6,8 @@ import io
 import logging
 from typing import Dict, Any, Optional, Tuple, List
 
+from .config_manager import computer_config
+
 try:
     import pyautogui
     from PIL import Image, ImageDraw, ImageFont
@@ -26,9 +28,12 @@ class ScreenController:
         if not self.initialized:
             logger.warning("pyautogui or PIL not available. Screen control features disabled.")
         else:
-            # Set up pyautogui safety settings
-            pyautogui.PAUSE = 0.1  # Small pause between actions
-            pyautogui.FAILSAFE = True  # Move mouse to corner to abort
+            # Set up pyautogui safety settings using config
+            pause_time = computer_config.get('mouse', 'pause_between_actions', 0.1)
+            failsafe = computer_config.get('mouse', 'failsafe', True)
+            
+            pyautogui.PAUSE = pause_time
+            pyautogui.FAILSAFE = failsafe
     
     async def capture_screen(self, 
                            region: Optional[Tuple[int, int, int, int]] = None,
@@ -62,8 +67,8 @@ class ScreenController:
                 draw = ImageDraw.Draw(screenshot)
                 for area in highlight_areas:
                     x, y, w, h = area.get('bounds', (0, 0, 100, 100))
-                    color = area.get('color', 'red')
-                    thickness = area.get('thickness', 3)
+                    color = area.get('color', computer_config.get('screen', 'highlight_color', 'red'))
+                    thickness = area.get('thickness', computer_config.get('screen', 'highlight_thickness', 3))
                     draw.rectangle([x, y, x + w, y + h], outline=color, width=thickness)
                     
                     # Add label if provided
@@ -77,7 +82,7 @@ class ScreenController:
             
             # Convert to base64
             buffered = io.BytesIO()
-            screenshot.save(buffered, format="PNG")
+            screenshot.save(buffered, format="PNG", quality=computer_config.get('screen', 'screenshot_quality', 90))
             img_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
             
             return {
@@ -94,8 +99,8 @@ class ScreenController:
     async def find_on_screen(self, 
                            image_path: Optional[str] = None,
                            image_base64: Optional[str] = None,
-                           confidence: float = 0.8,
-                           grayscale: bool = False) -> Dict[str, Any]:
+                           confidence: float = None,
+                           grayscale: bool = None) -> Dict[str, Any]:
         """
         Find an image on screen using template matching.
         
@@ -110,6 +115,12 @@ class ScreenController:
         """
         if not self.initialized:
             return {"error": "Screen control not available"}
+        
+        # Use config values if not provided
+        if confidence is None:
+            confidence = computer_config.get('vision', 'template_match_threshold', 0.8)
+        if grayscale is None:
+            grayscale = computer_config.get('vision', 'grayscale_matching', False)
         
         try:
             # Load template image
@@ -184,8 +195,8 @@ class ScreenController:
     
     async def wait_for_screen_change(self, 
                                    region: Optional[Tuple[int, int, int, int]] = None,
-                                   timeout: float = 5.0,
-                                   poll_interval: float = 0.1) -> Dict[str, Any]:
+                                   timeout: float = None,
+                                   poll_interval: float = None) -> Dict[str, Any]:
         """
         Wait for a change in the screen content.
         
@@ -199,6 +210,12 @@ class ScreenController:
         """
         if not self.initialized:
             return {"error": "Screen control not available"}
+        
+        # Use config values if not provided
+        if timeout is None:
+            timeout = computer_config.get('screen', 'wait_timeout', 5.0)
+        if poll_interval is None:
+            poll_interval = computer_config.get('screen', 'monitor_poll_interval', 0.1)
         
         try:
             # Capture initial state

@@ -139,29 +139,65 @@ Automatically extracts and parses:
 
 ## Configuration
 
-Browser behavior can be configured through environment variables or the `browser_config.json` file:
+The server uses a comprehensive configuration system that allows customization through JSON files and environment variables. See [CONFIG_README.md](CONFIG_README.md) for detailed documentation.
 
-```json
-{
-  "headless": false,
-  "slow_mo": 50,
-  "width": 1280,
-  "height": 800,
-  "debug_screenshots": true,
-  "timeout": 30000
-}
+### Configuration Files
+
+- **Global Configuration**: `config/server_config.json` - Main server settings
+- **Web Interaction**: `web_interaction/browser_config.json` - Browser-specific settings
+- **Computer Interaction**: `computer_interaction/computer_config.json` - Computer control settings
+
+### Quick Configuration
+
+1. Copy the example environment file:
+```bash
+cp .env.example .env
+```
+
+2. Edit `.env` to customize settings:
+```bash
+# Enable/disable features
+MCP_WEB_ENABLED=true
+MCP_COMPUTER_ENABLED=true
+
+# Set log level
+MCP_LOG_LEVEL=INFO
+
+# Browser settings
+MCP_BROWSER_HEADLESS=false
+MCP_BROWSER_WIDTH=1280
+MCP_BROWSER_HEIGHT=800
+```
+
+### Configuration Tools
+
+The server provides tools to manage configuration at runtime:
+
+- `get_config`: Retrieve current configuration
+- `update_config`: Update configuration values
+- `reload_config`: Reload configuration from file
+
+Example:
+```python
+# Update log level
+await update_config("server", "log_level", "DEBUG")
+
+# Check if a feature is enabled
+config = await get_config()
+web_enabled = config["config"]["web_interaction"]["enabled"]
 ```
 
 ### Environment Variables
 
-- `MCP_BROWSER_HEADLESS`: Set to "true" for headless mode (default: "false")
-- `MCP_BROWSER_SLOW_MO`: Slow down operations by specified milliseconds (default: 0)
-- `MCP_BROWSER_WIDTH`: Browser viewport width (default: 1280)
-- `MCP_BROWSER_HEIGHT`: Browser viewport height (default: 800)
-- `MCP_BROWSER_DEBUG_SCREENSHOTS`: Set to "true" to save screenshots (default: "false")
-- `MCP_BROWSER_TIMEOUT`: Default navigation timeout in milliseconds (default: 30000)
-- `MCP_CAPTURE_NETWORK`: Set to "true" to capture network requests (default: "false")
-- `PLAYWRIGHT_FORCE_VISIBLE`: Set to "true" to force visible browser regardless of other settings
+Common environment variables:
+
+- `MCP_LOG_LEVEL`: Set logging level (DEBUG, INFO, WARNING, ERROR)
+- `MCP_WEB_ENABLED`: Enable/disable web interaction (true/false)
+- `MCP_COMPUTER_ENABLED`: Enable/disable computer interaction (true/false)
+- `MCP_BROWSER_HEADLESS`: Run browser in headless mode (true/false)
+- `MCP_DEBUG_MODE`: Enable debug mode (true/false)
+
+For a complete list, see `.env.example` and [CONFIG_README.md](CONFIG_README.md).
 
 ## Contributing
 

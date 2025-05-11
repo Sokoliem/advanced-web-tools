@@ -11,12 +11,14 @@ from typing import Any, Dict, List, Optional
 
 from mcp.server.fastmcp import FastMCP, Context
 
-# Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+# Import and initialize configuration before logging
+from .config import server_config, get_config
+
+# Configure logging based on config
 logger = logging.getLogger(__name__)
 
 # Create MCP server
-mcp = FastMCP("Claude MCP Scaffold")
+mcp = FastMCP(server_config.get("server", "name", "Claude MCP Scaffold"))
 
 
 @mcp.tool()
@@ -30,6 +32,29 @@ async def echo(message: str) -> Dict[str, Any]:
     Returns:
         Dict: The echoed message.
     """
+    # Check if feature is enabled
+    if not server_config.is_feature_enabled("echo"):
+        return {
+            "content": [
+                {
+                    "type": "text",
+                    "text": "Echo feature is disabled in configuration"
+                }
+            ]
+        }
+    
+    # Check max message length from config
+    max_length = server_config.get("features", {}).get("echo", {}).get("max_message_length", 1000)
+    if len(message) > max_length:
+        return {
+            "content": [
+                {
+                    "type": "text",
+                    "text": f"Message too long. Maximum length is {max_length} characters"
+                }
+            ]
+        }
+    
     logger.info(f"Echo tool called with message: {message}")
     return {
         "content": [
@@ -56,6 +81,17 @@ async def calculator(operation: str, a: float, b: float, format: str = "standard
         Dict: The result of the calculation.
     """
     import math
+    
+    # Check if feature is enabled
+    if not server_config.is_feature_enabled("calculator"):
+        return {
+            "content": [
+                {
+                    "type": "text",
+                    "text": "Calculator feature is disabled in configuration"
+                }
+            ]
+        }
     
     logger.info(f"Calculator tool called with operation: {operation}, a: {a}, b: {b}, format: {format}")
     result = None
@@ -89,29 +125,33 @@ async def calculator(operation: str, a: float, b: float, format: str = "standard
     else:
         return {"content": [{"type": "text", "text": f"Error: Unknown operation '{operation}'. Supported operations: add, subtract, multiply, divide, power, root, log, modulo"}]}
     
-    # Format the result
+    # Format the result with configurable precision
+    precision = server_config.get("features", {}).get("calculator", {}).get("precision", 6)
+    
     if format.lower() == "scientific":
-        formatted_result = f"{result:.6e}"
+        formatted_result = f"{result:.{precision}e}"
     else:
-        formatted_result = str(result)
+        # For standard format, round to precision decimal places
+        formatted_result = f"{result:.{precision}f}".rstrip('0').rstrip('.')
     
     return {"content": [{"type": "text", "text": f"Result: {formatted_result}"}]}
 
-# Import and register web interaction tools
-try:
-    # Import browser manager and all tools from web_interaction
+# Import and register web interaction tools if enabled
+if server_config.is_web_enabled():
     try:
-        # Import and get browser_manager instance from web_interaction
-        from .web_interaction import browser_manager
-        logger.info("Using browser manager from web_interaction")
-        
-        # Import the register_all_tools function to register all tools at once
-        from .web_interaction import register_all_tools
-        
-        # Register all web interaction tools including the new enhanced capabilities
-        logger.info("Registering all web interaction tools...")
-        all_tools = register_all_tools(mcp, browser_manager)
-        logger.info(f"Successfully registered {len(all_tools)} web interaction tools")
+        # Import browser manager and all tools from web_interaction
+        try:
+            # Import and get browser_manager instance from web_interaction
+            from .web_interaction import browser_manager
+            logger.info("Using browser manager from web_interaction")
+            
+            # Import the register_all_tools function to register all tools at once
+            from .web_interaction import register_all_tools
+            
+            # Register all web interaction tools including the new enhanced capabilities
+            logger.info("Registering all web interaction tools...")
+            all_tools = register_all_tools(mcp, browser_manager)
+            logger.info(f"Successfully registered {len(all_tools)} web interaction tools")
         
         # Store references to specific tool categories for status reporting
         visual_tools = all_tools.get('visual_tools', {})
@@ -190,26 +230,123 @@ try:
 except ImportError as e:
     logger.warning(f"Web interaction tools not loaded. Error: {str(e)}")
     logger.warning("Make sure to install required dependencies with install_dependencies.py")
+else:
+    logger.info("Web interaction tools disabled in configuration")
 
-# Import and register computer interaction tools
-try:
-    from .computer_interaction import register_all_computer_tools
-    
-    logger.info("Registering computer interaction tools...")
-    computer_tools = register_all_computer_tools(mcp)
-    logger.info("Successfully registered computer interaction tools")
-    
-    # Store references for status reporting
-    screen_controller = computer_tools.get('screen_controller')
-    keyboard_mouse = computer_tools.get('keyboard_mouse')
-    window_manager = computer_tools.get('window_manager')
-    system_ops = computer_tools.get('system_ops')
-    computer_vision = computer_tools.get('computer_vision')
-    
-except ImportError as e:
-    logger.warning(f"Computer interaction tools not loaded. Error: {str(e)}")
-    logger.warning("Make sure to install required dependencies: pyautogui, pygetwindow, etc.")
+# Import and register computer interaction tools if enabled
+if server_config.is_computer_enabled():
+    try:
+        from .computer_interaction import register_all_computer_tools
+        
+        logger.info("Registering computer interaction tools...")
+        computer_tools = register_all_computer_tools(mcp)
+        logger.info("Successfully registered computer interaction tools")
+        
+        # Store references for status reporting
+        screen_controller = computer_tools.get('screen_controller')
+        keyboard_mouse = computer_tools.get('keyboard_mouse')
+        window_manager = computer_tools.get('window_manager')
+        system_ops = computer_tools.get('system_ops')
+        computer_vision = computer_tools.get('computer_vision')
+        
+    except ImportError as e:
+        logger.warning(f"Computer interaction tools not loaded. Error: {str(e)}")
+        logger.warning("Make sure to install required dependencies: pyautogui, pygetwindow, etc.")
+        computer_tools = None
+else:
+    logger.info("Computer interaction tools disabled in configuration")
     computer_tools = None
+
+
+@mcp.tool()
+async def get_config() -> Dict[str, Any]:
+    """
+    Get the current server configuration.
+
+    Returns:
+        Dict: Current configuration settings.
+    """
+    return {
+        "content": [
+            {
+                "type": "text",
+                "text": "Configuration retrieved successfully"
+            }
+        ],
+        "config": server_config.config
+    }
+
+
+@mcp.tool()
+async def update_config(section: str, key: str, value: Any) -> Dict[str, Any]:
+    """
+    Update a configuration value.
+
+    Args:
+        section: Configuration section to update
+        key: Configuration key to update
+        value: New value to set
+
+    Returns:
+        Dict: Update result.
+    """
+    try:
+        old_value = server_config.get(section, key)
+        server_config.set(section, key, value)
+        
+        # Save configuration if it's a persistent change
+        server_config.save()
+        
+        return {
+            "content": [
+                {
+                    "type": "text",
+                    "text": f"Configuration updated: [{section}]{key} = {value}"
+                }
+            ],
+            "old_value": old_value,
+            "new_value": value
+        }
+    except Exception as e:
+        logger.error(f"Error updating configuration: {str(e)}")
+        return {
+            "content": [
+                {
+                    "type": "text",
+                    "text": f"Error updating configuration: {str(e)}"
+                }
+            ]
+        }
+
+
+@mcp.tool()
+async def reload_config() -> Dict[str, Any]:
+    """
+    Reload configuration from file.
+
+    Returns:
+        Dict: Reload result.
+    """
+    try:
+        server_config.reload()
+        return {
+            "content": [
+                {
+                    "type": "text",
+                    "text": "Configuration reloaded successfully"
+                }
+            ]
+        }
+    except Exception as e:
+        logger.error(f"Error reloading configuration: {str(e)}")
+        return {
+            "content": [
+                {
+                    "type": "text",
+                    "text": f"Error reloading configuration: {str(e)}"
+                }
+            ]
+        }
 
 
 @mcp.tool()
@@ -223,9 +360,12 @@ async def server_status() -> Dict[str, Any]:
     try:
         # Gather basic server info
         status_info = {
-            "version": "0.3.0",  # Updated version with computer interaction
+            "version": server_config.get("server", "version", "0.3.0"),
+            "name": server_config.get("server", "name", "Claude MCP Scaffold"),
+            "log_level": server_config.get("server", "log_level", "INFO"),
             "uptime": "Unknown",  # Would need to track server start time
-            "tools_count": len(mcp.tools)
+            "tools_count": len(mcp.tools),
+            "config_path": server_config.config_path
         }
         
         # Add browser info if available
@@ -333,6 +473,9 @@ def help_prompt() -> str:
     - echo: Echo back a message
     - calculator: Perform enhanced arithmetic operations (add, subtract, multiply, divide, power, root, log, modulo)
     - server_status: Get information about the server's current state
+    - get_config: Get the current server configuration
+    - update_config: Update a configuration value
+    - reload_config: Reload configuration from file
     """
     
     web_tools_prompt = """

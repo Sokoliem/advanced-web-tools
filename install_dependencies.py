@@ -77,6 +77,14 @@ MCP_CAPTURE_NETWORK=false
 
 # Force browser visibility regardless of headless setting
 PLAYWRIGHT_FORCE_VISIBLE=true
+
+# Computer interaction settings
+# COMPUTER_SCREENSHOT_QUALITY=90
+# COMPUTER_MOUSE_DURATION=0.5
+# COMPUTER_TYPING_INTERVAL=0.05
+# COMPUTER_OCR_LANGUAGE=eng
+# COMPUTER_ENABLE_FAILSAFE=true
+# COMPUTER_COMMAND_TIMEOUT=30
 """)
         print("✅ Created default .env configuration file")
     else:
@@ -98,6 +106,16 @@ PLAYWRIGHT_FORCE_VISIBLE=true
         print("✅ Created default browser configuration file")
     else:
         print("ℹ️ Browser configuration file already exists")
+    
+    # Create computer_config.json in the computer_interaction directory
+    computer_config_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "computer_interaction")
+    if os.path.exists(computer_config_dir):
+        computer_config_file = os.path.join(computer_config_dir, "computer_config.json")
+        if not os.path.exists(computer_config_file):
+            print("ℹ️ Computer configuration file (computer_config.json) not found.")
+            print("   Please verify the computer_interaction module is properly installed.")
+        else:
+            print("✅ Computer configuration file already exists")
     
     print("\n✅ Claude MCP Scaffold installation completed successfully!")
     print("\nTo run the server:")

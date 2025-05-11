@@ -4,6 +4,8 @@ import asyncio
 import logging
 from typing import Dict, Any, List, Optional, Tuple, Union
 
+from .config_manager import computer_config
+
 try:
     import pyautogui
     import keyboard
@@ -31,7 +33,7 @@ class KeyboardMouseController:
     async def move_mouse(self, 
                         x: int, 
                         y: int, 
-                        duration: float = 0.5,
+                        duration: float = None,
                         relative: bool = False) -> Dict[str, Any]:
         """
         Move the mouse to specific coordinates.
@@ -47,6 +49,10 @@ class KeyboardMouseController:
         """
         if not self.initialized:
             return {"error": "Mouse control not available"}
+        
+        # Use config value if not provided
+        if duration is None:
+            duration = computer_config.get('mouse', 'movement_duration', 0.5)
         
         try:
             if relative:

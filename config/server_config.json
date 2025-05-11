@@ -1,0 +1,101 @@
+{
+  "server": {
+    "name": "Claude MCP Scaffold",
+    "version": "0.3.0",
+    "log_level": "INFO",
+    "log_format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    "max_concurrent_requests": 10,
+    "startup_timeout": 30,
+    "shutdown_timeout": 10
+  },
+  "web_interaction": {
+    "enabled": true,
+    "config_file": "./web_interaction/browser_config.json",
+    "browser": {
+      "headless": false,
+      "slow_mo": 100,
+      "width": 1280,
+      "height": 800,
+      "debug_screenshots": true,
+      "timeout": 30000,
+      "max_tabs": 8,
+      "tab_idle_timeout": 300
+    },
+    "persistence": {
+      "enabled": true,
+      "storage_dir": "./data/persistence",
+      "max_storage_size": "100MB",
+      "cleanup_interval": 3600
+    },
+    "error_handling": {
+      "max_retries": 3,
+      "retry_delay": 1000,
+      "capture_screenshots_on_error": true
+    }
+  },
+  "computer_interaction": {
+    "enabled": true,
+    "config_file": "./computer_interaction/computer_config.json",
+    "default_settings": {
+      "screenshot_quality": 90,
+      "mouse_duration": 0.5,
+      "typing_interval": 0.05,
+      "command_timeout": 30.0,
+      "enable_failsafe": true
+    },
+    "safety": {
+      "enable_failsafe": true,
+      "max_operation_time": 300.0,
+      "require_confirmation_for_commands": false,
+      "blocked_commands": ["rm -rf /", "format c:", "del /s /q"]
+    }
+  },
+  "features": {
+    "calculator": {
+      "enabled": true,
+      "precision": 6,
+      "max_calculation_time": 5.0
+    },
+    "echo": {
+      "enabled": true,
+      "max_message_length": 1000
+    },
+    "server_status": {
+      "enabled": true,
+      "include_system_info": true,
+      "include_performance_metrics": true
+    }
+  },
+  "environment": {
+    "override_from_env": true,
+    "env_prefix": "MCP_",
+    "allowed_env_vars": [
+      "MCP_LOG_LEVEL",
+      "MCP_BROWSER_HEADLESS",
+      "MCP_COMPUTER_ENABLED",
+      "MCP_DEBUG_MODE"
+    ]
+  },
+  "performance": {
+    "enable_profiling": false,
+    "memory_limit": "1GB",
+    "cpu_limit": 80,
+    "garbage_collection_interval": 300
+  },
+  "security": {
+    "enable_auth": false,
+    "auth_type": "none",
+    "allowed_hosts": ["localhost", "127.0.0.1"],
+    "rate_limiting": {
+      "enabled": false,
+      "max_requests_per_minute": 60
+    }
+  },
+  "monitoring": {
+    "enabled": true,
+    "metrics_collection": true,
+    "error_reporting": true,
+    "performance_tracking": true,
+    "health_check_interval": 60
+  }
+}

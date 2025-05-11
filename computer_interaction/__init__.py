@@ -7,6 +7,7 @@ from .system_operations import SystemOperations
 from .computer_vision import ComputerVisionTools
 from .unified_computer_tool import register_unified_computer_tool
 from .register_all import register_all_computer_tools
+from .config_manager import ComputerConfigManager, computer_config
 
 __all__ = [
     'ScreenController',
@@ -15,5 +16,7 @@ __all__ = [
     'SystemOperations',
     'ComputerVisionTools',
     'register_unified_computer_tool',
-    'register_all_computer_tools'
+    'register_all_computer_tools',
+    'ComputerConfigManager',
+    'computer_config'
 ]

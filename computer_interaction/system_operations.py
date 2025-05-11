@@ -7,6 +7,8 @@ import subprocess
 import logging
 from typing import Dict, Any, List, Optional
 
+from .config_manager import computer_config
+
 logger = logging.getLogger(__name__)
 
 
@@ -199,6 +201,21 @@ class SystemOperations:
         Returns:
             Dict with the result
         """
+        # Check if command is blocked
+        blocked_commands = computer_config.get('safety', 'blocked_commands', [])
+        for blocked in blocked_commands:
+            if blocked in command:
+                return {"error": f"Command blocked for safety: contains '{blocked}'"}
+        
+        # Use config timeout if not provided
+        if timeout is None:
+            timeout = computer_config.get('system', 'command_timeout', 30.0)
+        
+        # Check if confirmation required
+        if computer_config.get('safety', 'require_confirmation_for_commands', False):
+            logger.warning(f"Command execution requires confirmation: {command}")
+            # In a real implementation, this would prompt for user confirmation
+            # For now, we'll just log it
         try:
             result = subprocess.run(
                 command,
