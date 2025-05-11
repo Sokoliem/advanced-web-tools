@@ -1,208 +1,154 @@
-# Advanced Web Tools
-
-An MCP server that provides advanced web interaction and browser automation capabilities for Claude and other AI assistants, now with full computer control capabilities.
+# Advanced Web Tools MCP Server Testing Suite
 
 ## Overview
 
-This project provides a comprehensive MCP server that enables Claude and other AI agents to interact with web browsers and control computer systems. It allows AI models to perform a wide range of operations:
+This repository contains a comprehensive testing plan and framework for all 78 tools in the advanced-web-tools MCP server. The testing suite ensures thorough validation of functionality, performance, security, and reliability.
 
-**Web Interaction:**
-- Web navigation
-- Content extraction
-- Element interaction (click, type, etc.)
-- Structured data extraction
-- Console command execution
+## Repository Structure
 
-**Computer Control:**
-- Screenshot capture and analysis
-- Mouse and keyboard control
-- Window management
-- System operations
-- Computer vision and OCR
+```
+claude_mcp_scaffold/
+├── README.md                    # This file - overview and getting started
+├── testing-plan.md             # Comprehensive testing plan
+├── tool-inventory.md           # Complete list of all 78 tools with descriptions
+├── test-execution-template.md  # Template for manual test execution
+└── test-automation-framework.md # Automated testing framework specification
+```
 
 ## Quick Start
 
+### 1. Review the Testing Plan
+
+Start by reading `testing-plan.md` to understand:
+- Testing objectives and framework
+- Tool categories and testing approach
+- Test execution phases (20-day plan)
+- Performance benchmarks and success metrics
+
+### 2. Explore the Tool Inventory
+
+Check `tool-inventory.md` for:
+- Complete list of all 78 tools
+- Tool descriptions and categories
+- Testing priorities (Critical/High/Medium/Low)
+- Testing timeline by priority
+
+### 3. Execute Manual Tests
+
+Use `test-execution-template.md` to:
+- Document test execution consistently
+- Track test results and issues
+- Ensure comprehensive coverage
+- Generate test reports
+
+### 4. Implement Automated Testing
+
+Follow `test-automation-framework.md` to:
+- Set up the automated test environment
+- Implement test classes for each tool
+- Configure continuous integration
+- Generate automated reports
+
+## Testing Priorities
+
+The 78 tools are prioritized as follows:
+
+- **Critical Priority**: 8 tools (Week 1)
+- **High Priority**: 20 tools (Week 2)
+- **Medium Priority**: 35 tools (Weeks 3-4)
+- **Low Priority**: 15 tools (Week 4)
+
+## Key Testing Areas
+
+1. **Basic Functionality**: Verify core operations
+2. **Error Handling**: Test failure scenarios
+3. **Performance**: Measure speed and resource usage
+4. **Security**: Validate input handling and access control
+5. **Integration**: Test tool combinations
+6. **Compatibility**: Cross-browser and platform testing
+
+## Success Criteria
+
+- 100% coverage for critical priority tools
+- 95% coverage for high priority tools
+- 80% coverage for medium priority tools
+- 60% coverage for low priority tools
+- Zero critical security issues
+- Performance within defined benchmarks
+
+## Getting Started
+
 ### Prerequisites
 
-- Python 3.9+
-- [Playwright](https://playwright.dev/python/docs/intro) for browser automation
-- Beautiful Soup for HTML parsing
-- PyAutoGUI for computer control (optional)
-- Additional dependencies for computer interaction (see COMPUTER_TOOLS_README.md)
+- Node.js 18+ 
+- Access to advanced-web-tools MCP server
+- Test browser environments (Chrome, Firefox, Safari, Edge)
+- Basic knowledge of MCP architecture
 
-### Installation
+### Setup Instructions
 
-1. Clone this repository:
-```bash
-git clone https://github.com/your-username/claude-mcp-scaffold.git
-cd claude-mcp-scaffold
-```
+1. Clone this repository
+2. Install dependencies: `npm install`
+3. Configure test environment: `npm run setup:test`
+4. Review test configuration in `config/test-config.json`
+5. Start testing: `npm run test:all`
 
-2. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
+## Test Execution Workflow
 
-3. Install browser drivers:
-```bash
-playwright install chromium
-```
+### Manual Testing
 
-### Running the Server
+1. Select tool from inventory
+2. Use test execution template
+3. Document results thoroughly
+4. File issues for failures
+5. Update test status tracking
 
-```bash
-python -m claude_mcp_scaffold
-```
+### Automated Testing
 
-## Features
+1. Run automated test suite
+2. Review generated reports
+3. Investigate failures
+4. Update test cases as needed
+5. Monitor CI/CD pipeline
 
-### Web Interaction
+## Reporting
 
-**Unified Web Interaction Tool**
-
-The main tool, `web_interact`, allows for multiple operations in a single call:
-
-```json
-{
-  "operations": [
-    {
-      "type": "navigate",
-      "params": {
-        "url": "https://example.com"
-      }
-    },
-    {
-      "type": "extract_content",
-      "params": {
-        "include_html": false
-      }
-    }
-  ]
-}
-```
-
-### Computer Interaction
-
-**Unified Computer Use Tool**
-
-The `computer_use` tool provides full computer control:
-
-```json
-{
-  "operations": [
-    {
-      "type": "capture_screen",
-      "params": {}
-    },
-    {
-      "type": "click",
-      "params": {
-        "x": 100,
-        "y": 200
-      }
-    },
-    {
-      "type": "type_text",
-      "params": {
-        "text": "Hello, World!"
-      }
-    }
-  ]
-}
-```
-
-Capabilities include:
-- Screen capture and analysis
-- Mouse and keyboard control
-- Window management
-- System operations
-- Computer vision and OCR
-
-For detailed documentation on computer interaction tools, see [COMPUTER_TOOLS_README.md](COMPUTER_TOOLS_README.md).
-
-### Persistent Browser State
-
-The scaffold maintains browser state between calls, allowing for multi-step interactions.
-
-### Console Access
-
-Provides direct access to browser console for executing JavaScript commands and viewing logs.
-
-### Structured Data Extraction
-
-Automatically extracts and parses:
-- Products
-- Articles
-- Tables
-- Lists
-- JSON-LD data
-
-## Configuration
-
-The server uses a comprehensive configuration system that allows customization through JSON files and environment variables. See [CONFIG_README.md](CONFIG_README.md) for detailed documentation.
-
-### Configuration Files
-
-- **Global Configuration**: `config/server_config.json` - Main server settings
-- **Web Interaction**: `web_interaction/browser_config.json` - Browser-specific settings
-- **Computer Interaction**: `computer_interaction/computer_config.json` - Computer control settings
-
-### Quick Configuration
-
-1. Copy the example environment file:
-```bash
-cp .env.example .env
-```
-
-2. Edit `.env` to customize settings:
-```bash
-# Enable/disable features
-MCP_WEB_ENABLED=true
-MCP_COMPUTER_ENABLED=true
-
-# Set log level
-MCP_LOG_LEVEL=INFO
-
-# Browser settings
-MCP_BROWSER_HEADLESS=false
-MCP_BROWSER_WIDTH=1280
-MCP_BROWSER_HEIGHT=800
-```
-
-### Configuration Tools
-
-The server provides tools to manage configuration at runtime:
-
-- `get_config`: Retrieve current configuration
-- `update_config`: Update configuration values
-- `reload_config`: Reload configuration from file
-
-Example:
-```python
-# Update log level
-await update_config("server", "log_level", "DEBUG")
-
-# Check if a feature is enabled
-config = await get_config()
-web_enabled = config["config"]["web_interaction"]["enabled"]
-```
-
-### Environment Variables
-
-Common environment variables:
-
-- `MCP_LOG_LEVEL`: Set logging level (DEBUG, INFO, WARNING, ERROR)
-- `MCP_WEB_ENABLED`: Enable/disable web interaction (true/false)
-- `MCP_COMPUTER_ENABLED`: Enable/disable computer interaction (true/false)
-- `MCP_BROWSER_HEADLESS`: Run browser in headless mode (true/false)
-- `MCP_DEBUG_MODE`: Enable debug mode (true/false)
-
-For a complete list, see `.env.example` and [CONFIG_README.md](CONFIG_README.md).
+Test results are generated in multiple formats:
+- JSON for programmatic access
+- HTML for visual reports
+- JUnit XML for CI integration
+- Performance metrics dashboards
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit pull requests or open issues to improve this scaffold.
+When adding new tests or updating existing ones:
 
-## License
+1. Follow the established patterns
+2. Document changes thoroughly
+3. Update relevant documentation
+4. Ensure backwards compatibility
+5. Add appropriate test coverage
 
-[Your license here]
+## Maintenance
+
+- Weekly review of test results
+- Monthly update of test baselines
+- Quarterly security assessment
+- Continuous improvement of test coverage
+
+## Contact
+
+For questions or issues regarding the testing suite:
+- File an issue in this repository
+- Contact the MCP development team
+- Refer to MCP documentation
+
+## Resources
+
+- [MCP Official Documentation](https://modelcontextprotocol.io/)
+- [Advanced Web Tools Documentation](https://github.com/modelcontextprotocol/servers)
+- [MCP TypeScript SDK](https://github.com/modelcontextprotocol/typescript-sdk)
+
+---
+
+*This testing suite is designed to ensure the reliability and quality of the advanced-web-tools MCP server. All 78 tools undergo rigorous testing to meet enterprise-grade standards.*
